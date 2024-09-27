@@ -1,3 +1,13 @@
+## TO RUN THIS PROJECT
+```bash
+
+make docker-compose_infra_up
+make run_products_service
+make run_identities_service
+
+```
+
+
 [![CI](https://github.com/meysamhadeli/shop-golang-microservices/actions/workflows/ci.yml/badge.svg?branch=main&style=flat-square)](https://github.com/meysamhadeli/shop-golang-microservices/actions/workflows/ci.yml)
 ![Go Version](https://img.shields.io/badge/go%20version-%3E=1.21-61CFDD.svg?style=flat-square)
 # Golang Microservices
@@ -116,3 +126,5 @@ Please follow this [contribution guideline](./CONTRIBUTION.md) to submit a pull 
 
 ## License
 This project is made available under the MIT license. See [LICENSE](https://github.com/meysamhadeli/shop-golang-microservices/blob/main/LICENSE) for details.
+
+

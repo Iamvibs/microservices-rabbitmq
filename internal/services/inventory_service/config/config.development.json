@@ -36,8 +36,8 @@
   "gormPostgres": {
     "host": "localhost",
     "port": 5432,
-    "user": "postgres",
-    "password": "postgres",
+    "user": "postgress",
+    "password": "postgress",
     "dbName": "inventory_service",
     "sslMode": false
   }
