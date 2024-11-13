@@ -5,7 +5,128 @@ make docker-compose_infra_up
 make run_products_service
 make run_identities_service
 
+
+IF MAKE NOT INSTALLED
+
+
+docker-compose -f deployments/docker-compose/infrastructure.yaml up --build
+cd internal/services/product_service/ && 	go run ./cmd/main.go
+cd internal/services/identity_service/ && 	go run ./cmd/main.go
 ```
+
+
+# API Documentation
+
+This documentation provides information about the Identity and Product API endpoints and how to use them in Postman.
+
+## Base URLs
+
+- Identity API: `http://localhost:5002`
+- Product API: `http://localhost:5000`
+
+## Authentication
+
+The API uses OAuth 2.0 password grant type for authentication. You'll need to obtain a token before accessing protected endpoints.
+
+### Getting an Access Token
+
+```http
+GET {{identity-api}}/connect/token
+```
+
+**Query Parameters:**
+- `grant_type`: password
+- `client_id`: clientId
+- `client_secret`: clientSecret
+- `scope`: all
+- `username`: admin
+- `password`: admin
+
+**Headers:**
+```
+Content-Type: application/json
+Accept: application/json
+```
+
+The response will contain an access token that you'll need for subsequent requests.
+
+### Validating Token
+
+```http
+GET {{identity-api}}/validate-token
+```
+
+**Headers:**
+```
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {your-access-token}
+```
+
+## Product API Endpoints
+
+### Create Product
+
+```http
+POST {{product-api}}/api/v1/products
+```
+
+**Headers:**
+```
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {your-access-token}
+```
+
+**Request Body:**
+```json
+{
+  "description": "test-desc",
+  "name": "test-product",
+  "price": 20
+}
+```
+
+### Update Product
+
+```http
+PUT {{product-api}}/api/v1/products/{product-id}
+```
+
+**Headers:**
+```
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {your-access-token}
+```
+
+**Request Body:**
+```json
+{
+  "description": "test-desc",
+  "name": "test-product",
+  "price": 40
+}
+```
+
+## Setting Up in Postman
+
+1. Create a new collection in Postman
+2. Set up environment variables:
+   - `identity-api`: `http://localhost:5002`
+   - `product-api`: `http://localhost:5000`
+
+3. For authenticated requests, you'll need to:
+   - First make the token request
+   - Copy the access token from the response
+   - Use it in the `Authorization` header for subsequent requests
+
+### Authentication Flow
+1. Make the token request
+2. The response will contain an `access_token`
+3. Use this token in the `Authorization` header as `Bearer {access_token}`
+4. You can validate the token using the validate-token endpoint
+5. Use the same token for Product API requests
 
 
 [![CI](https://github.com/meysamhadeli/shop-golang-microservices/actions/workflows/ci.yml/badge.svg?branch=main&style=flat-square)](https://github.com/meysamhadeli/shop-golang-microservices/actions/workflows/ci.yml)
@@ -15,58 +136,7 @@ make run_identities_service
 The main idea of creating this project is implementing an infrastructure for up and running distributed system with the latest technology and architecture like Vertical Slice Architecture, OpenTelemetry, RabbitMq in Golang, and we will not deal mainly with business.
 
 <a href="https://gitpod.io/#https://github.com/meysamhadeli/shop-golang-microservices"><img alt="Open in Gitpod" src="https://gitpod.io/button/open-in-gitpod.svg"/></a>
-
-## The Goals of This Project
-
-- :sparkle: Using `Vertical Slice Architecture` for `architecture level`.
-- :sparkle: Using `Rabbitmq` for `Event Driven Architecture` between our microservices with `streadway/amqp` library.
-- :sparkle: Using `gRPC` for `internal communication` between our microservices with `grpc/grpc-go` library.
-- :sparkle: Using `CQRS` implementation with `mehdihadeli/Go-MediatR` library.
-- :sparkle: Using `Postgres` for `database` in our microservices with `go-gorm/gorm` library.
-- :sparkle: Using `go-playground/validator` for `validating input` data in the REST calls.
-- :sparkle: Using `OpenTelemetry` for `distributed tracing` top of `Jaeger`.
-- :sparkle: Using `OAuth2` for implementation `authentication` and `authorization` with `go-oauth2/oauth2` library.
-- :sparkle: Using `Echo framework` for `RESTFul api`.
-- :sparkle: Using `Swagger` with `swaggo/swag` library for api documentation.
-- :sparkle: Using `uber-go/fx` library for `dependency injection`.
-- :sparkle: Using `Viper` for `configuration management`.
-- :sparkle: Using `logrus` as a `structured logger`.
-- :sparkle: Using `Unit Testing`,`Integration Testing` and `End To End Testing` for testing level.
-- :sparkle: Using `Docker-Compose` for our `deployment` mechanism.
-- :construction: Using `OpenTelemetry` for `monitoring` top of `Prometteuse` and `Grafana`
-- :construction: Using `MongoDB` for read side with `mongo-driver`.
-- :construction: Using `Domain Driven Design` (DDD) to implement all `business` processes in microservices.
-- :construction: Using `Inbox Pattern` for ensuring message idempotency for receiver and `Exactly once Delivery`.
-- :construction: Using `Outbox Pattern` for ensuring no message is lost and there is at `At Least One Delivery`.
-  
-## Plan
-
-> 🌀This project is a work in progress, new features will be added over time.🌀
-
-I will try to register future goals and additions in the [Issues](https://github.com/meysamhadeli/shop-golang-microservices/issues) section of this repository.
-
-## Technologies - Libraries
-
-- ✔️ **[`labstack/echo`](https://github.com/labstack/echo)** - High performance, minimalist Go web framework
-- ✔️ **[`go-gorm/gorm`](https://github.com/go-gorm/gorm)** - The fantastic ORM library for Go, aims to be developer friendly
-- ✔️ **[`sirupsen/logrus`](https://github.com/sirupsen/logrus)** - Logrus is a structured logger for Go
-- ✔️ **[`streadway/amqp`](https://github.com/streadway/amqp)** - Go RabbitMQ Client Library
-- ✔️ **[`spf13/viper`](https://github.com/spf13/viper)** - Go configuration with fangs
-- ✔️ **[`swaggo/echo-swagger`](https://github.com/swaggo/echo-swagger)** - Echo middleware to automatically generate RESTful API documentation
-- ✔️ **[`mehdihadeli/Go-MediatR`](https://github.com/mehdihadeli/Go-MediatR)** - This package is a Mediator Pattern implementation in Go
-- ✔️ **[`go-playground/validator`](https://github.com/go-playground/validator)** - Implements value validations for structs and individual fields based on tags
-- ✔️ **[`open-telemetry/opentelemetry-go`](https://github.com/open-telemetry/opentelemetry-go)** - Implementation of OpenTelemetry in Go for distributed-tracing
-- ✔️ **[`meysamhadeli/problem-details`](https://github.com/meysamhadeli/problem-details)** - Error Handler for mapping our error to standardized error payload to client
-- ✔️ **[`go-resty/resty`](https://github.com/go-resty/resty)** - Simple HTTP and REST client library for Go (inspired by Ruby rest-client)
-- ✔️ **[`grpc/grpc-go`](https://github.com/grpc/grpc-go)** - The Go language implementation of gRPC. HTTP/2 based RPC
-- ✔️ **[`go-oauth2/oauth2`](https://github.com/go-oauth2/oauth2)** - An open protocol to allow secure authorization in a simple and standard method
-- ✔️ **[`stretchr/testify`](https://github.com/stretchr/testify)** - A toolkit with common assertions and mocks that plays nicely with the standard library
-- ✔️ **[`uber-go/fx`](https://github.com/uber-go/fx)** - Fx is a dependency injection system for Go
-- ✔️ **[`cenkalti/backoff`](https://github.com/cenkalti/backoff)** - This is a Go port of the exponential backoff algorithm
-- ✔️ **[`stretchr/testify`](https://github.com/stretchr/testify)** - A toolkit with common assertions and mocks that plays nicely with the standard library
-- ✔️ **[`testcontainers/testcontainers-go`](https://github.com/testcontainers/testcontainers-go)** - it's a package to create and clean up container for automated integration/smoke tests
-- ✔️ **[`avast/retry-go`](https://github.com/avast/retry-go)** - Simple golang library for retry mechanism
-- ✔️ **[`ahmetb/go-linq`](https://github.com/ahmetb/go-linq)** - .NET LINQ capabilities in Go
+ 
 
 ## The Domain And Bounded Context - Service Boundary
 
@@ -100,31 +170,5 @@ I used CQRS to decompose my features into small parts that makes our application
 - It gives us better separation of concerns and cross-cutting concern (with help of mediatr behavior pipelines), instead of bloated service classes doing many things.
 
 Using the CQRS pattern, we cut each business functionality into vertical slices, for each of these slices we group classes (see [technical folders structure](http://www.kamilgrzybek.com/design/feature-folders)) specific to that feature together (command, handlers, infrastructure, repository, controllers, etc). In our CQRS pattern each command/query handler is a separate slice. This is where you can reduce coupling between layers. Each handler can be a separated code unit, even copy/pasted. Thanks to that, we can tune down the specific method to not follow general conventions (e.g. use custom postgresql query or even different storage). In a traditional layered architecture, when we change the core generic mechanism in one layer, it can impact all methods.
-
-
-# Support
-
-If you like my work, feel free to:
-
-- ⭐ this repository. And we will be happy together :)
-
-Thanks a bunch for supporting me!
-
-## Contribution
-
-Thanks to all [contributors](https://github.com/meysamhadeli/shop-golang-microservices/graphs/contributors), you're awesome and this wouldn't be possible without you! The goal is to build a categorized community-driven collection of very well-known resources.
-
-Please follow this [contribution guideline](./CONTRIBUTION.md) to submit a pull request or create the issue.
-
-## Project References & Credits
-
-- [https://github.com/golang-standards/project-layout](https://github.com/golang-standards/project-layout)
-- [https://github.com/AleksK1NG/Go-Elasticsearch-RabbitMQ](https://github.com/AleksK1NG/Go-Elasticsearch-RabbitMQ)
-- [https://github.com/ThreeDotsLabs/wild-workouts-go-ddd-example](https://github.com/ThreeDotsLabs/wild-workouts-go-ddd-example)
-- [https://github.com/kgrzybek/modular-monolith-with-ddd](https://github.com/kgrzybek/modular-monolith-with-ddd)
-- [https://github.com/jbogard/ContosoUniversityDotNetCore-Pages](https://github.com/jbogard/ContosoUniversityDotNetCore-Pages)
-
-## License
-This project is made available under the MIT license. See [LICENSE](https://github.com/meysamhadeli/shop-golang-microservices/blob/main/LICENSE) for details.
 
 
